@@ -34,14 +34,19 @@ def group_cv_evaluate(model_factory, X, y, groups):
         model = model_factory()
         model.fit(X[train_mask], y[train_mask])
         pred = model.predict(X[test_mask])
+        pred_train = model.predict(X[train_mask])
 
         y_test = y[test_mask]
         rmse = np.sqrt(mean_squared_error(y_test, pred))
         mae = mean_absolute_error(y_test, pred)
+        rmse_train = np.sqrt(mean_squared_error(y[train_mask], pred_train))
         # R2 braucht mind. 2 Testpunkte mit Varianz, sonst undefiniert
         r2 = r2_score(y_test, pred) if (test_mask.sum() >= 2 and np.var(y_test) > 0) else np.nan
 
-        rows.append({"group": g, "n_test": int(test_mask.sum()), "rmse": rmse, "mae": mae, "r2": r2})
+        rows.append({
+            "group": g, "n_test": int(test_mask.sum()),
+            "rmse": rmse, "mae": mae, "r2": r2, "rmse_train": rmse_train,
+        })
 
     return pd.DataFrame(rows)
 
@@ -54,5 +59,6 @@ def summarize_folds(fold_df):
         "mae_std": fold_df["mae"].std(),
         "r2_mean": fold_df["r2"].mean(skipna=True),
         "r2_std": fold_df["r2"].std(skipna=True),
+        "rmse_train_mean": fold_df["rmse_train"].mean(),
         "n_folds": len(fold_df),
     })

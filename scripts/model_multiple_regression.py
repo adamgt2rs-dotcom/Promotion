@@ -62,7 +62,7 @@ def main():
 
     res_df = pd.DataFrame(results)[
         ["target", "protocol", "feature_set", "n_obs", "n_folds",
-         "rmse_mean", "rmse_std", "mae_mean", "mae_std", "r2_mean", "r2_std"]
+         "rmse_mean", "rmse_std", "rmse_train_mean", "mae_mean", "mae_std", "r2_mean", "r2_std"]
     ]
     res_df = res_df.sort_values(["target", "protocol", "rmse_mean"])
 
