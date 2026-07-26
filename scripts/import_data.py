@@ -62,6 +62,19 @@ def main():
     long_df = pd.concat(frames, ignore_index=True)
     long_df = long_df.rename(columns={"vb_avg": "VB", "vbmax": "VBmax"})
 
+    # Bekannter Datenfehler: Scheibe 1, Werkzeug 7, Bohrung 2 und 14 - waehrend
+    # dieser Bohrungen fand ein Lochkreis-Wechsel auf derselben Scheibe statt,
+    # wodurch die iz-Kennzahlen (Vorschubachsenstrom) verfaelscht aufgezeichnet
+    # wurden (isp-Kennzahlen sind davon nicht betroffen). VB/VBmax bleiben
+    # gueltige Verschleissmessungen des Werkzeugs und werden nicht veraendert.
+    iz_cols = ["iz_max", "iz_mittel", "iz_std"]
+    bad = (
+        (long_df["scheibe_id"] == 1)
+        & (long_df["werkzeug_id"] == 7)
+        & (long_df["bohrung_nr"].isin([2, 14]))
+    )
+    long_df.loc[bad, iz_cols] = pd.NA
+
     long_df = long_df[[
         "scheibe_id", "lochkreis", "werkstoff", "werkzeug_id", "bohrung_nr",
         "VB", "VBmax",

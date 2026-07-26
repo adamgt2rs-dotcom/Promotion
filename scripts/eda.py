@@ -55,7 +55,7 @@ def main():
         for j, w in enumerate(WEAR):
             ax = axes[i, j]
             ax.scatter(da[sig], da[w], s=12, alpha=0.6, c=da["scheibe_id"], cmap="viridis")
-            r = np.corrcoef(da[sig], da[w])[0, 1]
+            r = da[sig].corr(da[w])
             ax.set_title(f"{sig} vs {w}  (r={r:.2f})", fontsize=9)
             ax.set_xlabel(sig, fontsize=8)
             ax.set_ylabel(w, fontsize=8)
